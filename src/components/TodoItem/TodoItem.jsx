@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import "./TodoItem.css"
 
-import Checkbox from '@material-ui/core/Checkbox';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
 import DeleteIcon from '@material-ui/icons/Delete';
 import BorderColorIcon from '@material-ui/icons/BorderColor';
+
+import styled from 'styled-components/native';
+import { Button, TextInput, StyleSheet, CheckBox, Text, View } from "react-native";
+
 
 const TodoItem = ({ todo }) => {
     const [newText, setNewText] = useState(todo.text); //новый текст при изменении todo
@@ -25,7 +25,7 @@ const TodoItem = ({ todo }) => {
     //изменение todo
     const changeTodo = () => {
         setChange(false)
-        if(newText.length > 0){ //проверка на не пустую строку. Если не пустая - изменяем todo
+        if (newText.length > 0) { //проверка на не пустую строку. Если не пустая - изменяем todo
             const newTodo = {
                 text: newText,
                 dataTime: todo.dataTime
@@ -34,55 +34,71 @@ const TodoItem = ({ todo }) => {
         }
     }
 
+    const ViewStyled = styled.View`
+    justify-content: space-between
+    min-height: 90px;
+    border: 1px solid #2196f3;
+    border-radius: 4px;
+    margin-top: 5px;
+`;
+
+    const TextStyled = styled.Text`
+      margin-top: 10px;
+`;
+    const TextToDo = styled.Text`
+       margin-left: 30px;
+       hyphens: auto;
+       word-break: break-all;
+       textDecoration: ${props => props.isComplete ? "line-through" : "none"};
+       display: ${props => props.change ? "none" : "inline-block"};
+`;
+    const TextInput = styled.TextInput`
+       display: ${props => props.change ? "flex" : "none"};
+`;
+    const ViewChange = styled.View`
+       display: ${props => props.change ? "flex" : "none"};
+`;
+
     return (
-        <div className="item-flex">
-            <Checkbox
-                checked={todo.isComplete}
-                id="isComplete"
-                name="isComplete"
-                onClick={changeCompleteTodo}
-                sx={{ mt: 1 }}
-            />
-            <div style={{
-                display: 'flex'
-            }}>
-                <BorderColorIcon 
-                onClick={e => setChange(!change)}
-                sx={{mt: 2, mr: 2}}
+        <ViewStyled >
+            <View style={styles.containerCheckAndChange}>
+                <CheckBox
+                    style={styles.checkBox}
+                    value={todo.isComplete}
+                    onValueChange={changeCompleteTodo}
                 />
-                <Typography
-                    sx={{
-                        textDecoration: todo.isComplete ? 'line-through' : 'none',
-                        display: change ? 'none' : 'flex',
-                        mt: 2
-                    }}
+                <BorderColorIcon
+                    onClick={e => setChange(!change)}
+                />
+            </View>
+            <View>
+                <TextToDo
+                    isComplete={todo.isComplete}
+                    change={change}
                 >
-                     {todo.text}
-                </Typography>
-                <TextField
-                    label="Изменение"
+                    {todo.text}
+                </TextToDo>
+                <TextInput
+                    change={change}
                     autoFocus
-                    size="small"
+                    placeholder="Изменение"
                     value={newText}
                     onChange={e => setNewText(e.target.value)}
                     onBlur={changeTodo}
-                    sx={{ display: change ? 'flex' : 'none' }}
-
                 />
-            </div>
-            <Typography
-                sx={{ mt: 2 }}>
-                Создан в {todo.dataTime}
-            </Typography>
-            <div>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={e => setChange(false)}
-                    sx={{ mr: 2,  display: change ? 'inline ' : 'none', }}
+            </View>
+            <View style={styles.containerButton}>
+                <TextStyled
+                    isComplete={todo.isComplete}
                 >
-                    Изменить
-                </Button>
+                    Создан в {todo.dataTime}
+                </TextStyled>
+                <ViewChange change={change}>
+                    <Button
+                        onClick={e => setChange(false)}
+                        title="Изменить"
+                    />
+                </ViewChange>
                 <DeleteIcon
                     color="secondary"
                     onClick={removeTodo}
@@ -90,9 +106,30 @@ const TodoItem = ({ todo }) => {
                 >
                     Удалить
                 </DeleteIcon>
-            </div>
-        </div>
+            </View>
+        </ViewStyled>
     )
 }
+
+const styles = StyleSheet.create({
+    containerCheckAndChange: {
+        display: "flex",
+        flexDirection: "row",
+
+    },
+    checkBox: {
+        margin: 5
+    },
+    containerButton: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-around",
+    },
+    borderColorIcon: {
+        marginTop: 10,
+        marginRight: 10,
+    },
+});
+
 
 export default TodoItem
